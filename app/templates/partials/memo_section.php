@@ -8,7 +8,7 @@
         <div class="bg-gray-50 p-4 rounded-lg border flex flex-col">
             <h3 class="font-bold text-lg text-gray-800 break-all"><?php echo htmlspecialchars($memo['title']); ?></h3>
             <p class="text-xs text-gray-400 my-2"><?php echo $memo['created_at']; ?></p>
-            <p class="text-gray-700 whitespace-pre-wrap break-words"><?php echo nl2br(htmlspecialchars($memo['content'])); ?></p>
+            <p class="text-gray-700 whitespace-pre-wrap break-words"><?php echo htmlspecialchars($memo['content']); ?></p>
         </div>
         <?php endforeach; ?>
     </div>
