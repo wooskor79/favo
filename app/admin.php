@@ -30,10 +30,14 @@ $current_tab = $_GET['tab'] ?? 'memos';
         <?php include 'templates/partials/admin_header.php'; ?>
 
         <div class="mb-8 border-b border-gray-200">
-            <nav class="flex space-x-4" aria-label="Tabs">
+            <nav class="flex items-center" aria-label="Tabs">
                 <a href="?tab=memos" class="tab-link <?php if($current_tab === 'memos') echo 'active'; ?>">메모 관리</a>
+                <span class="text-gray-400 dark:text-gray-600 mx-3">|</span>
                 <a href="?tab=favorites" class="tab-link <?php if($current_tab === 'favorites') echo 'active'; ?>">즐겨찾기 관리</a>
+                <span class="text-gray-400 dark:text-gray-600 mx-3">|</span>
                 <a href="?tab=quick_links" class="tab-link <?php if($current_tab === 'quick_links') echo 'active'; ?>">빠른 링크 관리</a>
+                <span class="text-gray-400 dark:text-gray-600 mx-3">|</span>
+                <a href="?tab=url_shortener" class="tab-link <?php if($current_tab === 'url_shortener') echo 'active'; ?>">URL줄이기 관리</a>
             </nav>
         </div>
 
@@ -45,6 +49,9 @@ $current_tab = $_GET['tab'] ?? 'memos';
                 include 'templates/admin/favorites.php';
             } elseif ($current_tab === 'quick_links') {
                 include 'templates/admin/quick_links.php';
+            } elseif ($current_tab === 'url_shortener') {
+                // 이 곳에 URL 줄이기 관리 페이지의 콘텐츠를 추가하세요.
+                echo "<div class='bg-white p-6 rounded-xl shadow-md'><p>URL 줄이기 관리 페이지입니다.</p></div>";
             }
             ?>
         </div>
