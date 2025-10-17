@@ -31,8 +31,8 @@
                         <span class="view-mode"><?php echo htmlspecialchars($fav['alias']); ?></span>
                         <input type="text" value="<?php echo htmlspecialchars($fav['alias']); ?>" class="edit-mode hidden w-full p-2 border rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </td>
-                    <td class="px-5 py-4 border-b border-gray-200 text-sm align-middle">
-                        <span class="view-mode"><a href="<?php echo htmlspecialchars($fav['url']); ?>" target="_blank" class="text-blue-500 hover:underline truncate block"><?php echo htmlspecialchars($fav['url']); ?></a></span>
+                    <td class="px-5 py-4 border-b border-gray-200 text-sm align-middle max-w-xs">
+                        <span class="view-mode"><a href="<?php echo htmlspecialchars($fav['url']); ?>" target="_blank" class="text-blue-500 hover:underline truncate block" title="<?php echo htmlspecialchars($fav['url']); ?>"><?php echo htmlspecialchars($fav['url']); ?></a></span>
                         <input type="text" value="<?php echo htmlspecialchars($fav['url']); ?>" class="edit-mode hidden w-full p-2 border rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </td>
                     <td class="px-5 py-4 border-b border-gray-200 text-sm align-middle">
@@ -59,4 +59,3 @@
         </tbody>
     </table>
 </div>
-
