@@ -64,4 +64,31 @@ unset($_SESSION['error']);
 
 $is_loggedin = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
+
+// =============== 5. URL 단축기(Shortener) 연동 ===============
+$shortener_links = [];
+// 관리자 페이지의 'url_shortener' 탭에서만 DB에 연결하고 데이터를 가져옵니다.
+if ($is_loggedin && basename($_SERVER['PHP_SELF']) == 'admin.php' && ($_GET['tab'] ?? '') === 'url_shortener') {
+    $shortener_db_name = 'shortener';
+    $conn_shortener = @new mysqli($db_host, $db_user, $db_pass, $shortener_db_name);
+
+    if (!$conn_shortener->connect_error) {
+        $conn_shortener->set_charset("utf8mb4");
+        $search_query = $_GET['q'] ?? '';
+        $sql = "SELECT * FROM links WHERE code IS NOT NULL";
+        if (!empty($search_query)) {
+            $sql .= " AND (code LIKE '%" . $conn_shortener->real_escape_string($search_query) . "%' OR title LIKE '%" . $conn_shortener->real_escape_string($search_query) . "%')";
+        }
+        $sql .= " ORDER BY id DESC";
+        
+        $shortener_result = $conn_shortener->query($sql);
+        if ($shortener_result) {
+            while($row = $shortener_result->fetch_assoc()) {
+                $shortener_links[] = $row;
+            }
+        }
+        $conn_shortener->close();
+    }
+}
+
 ?>

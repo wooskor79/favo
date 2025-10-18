@@ -201,3 +201,13 @@ async function deleteMemo(id) {
         }
     } catch (error) { alert('오류가 발생했습니다.'); }
 }
+
+// [새로 추가] 클립보드 복사 함수
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('클립보드에 복사되었습니다: ' + text);
+    }, function(err) {
+        alert('클립보드 복사에 실패했습니다.');
+    });
+}
+
