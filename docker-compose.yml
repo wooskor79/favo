@@ -11,6 +11,8 @@ services:
       - "9030:80"
     volumes:
       - ./app:/var/www/html
+      - /volume1/etc/ectfiles/images:/var/www/html/images
+      - /volume1/etc/ectfiles/cache:/var/www/html/cache
     networks:
       - web_services_network
 

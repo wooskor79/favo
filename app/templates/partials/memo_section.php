@@ -9,6 +9,17 @@
             <h3 class="font-bold text-lg text-gray-800 break-all"><?php echo htmlspecialchars($memo['title']); ?></h3>
             <p class="text-xs text-gray-400 my-2"><?php echo $memo['created_at']; ?></p>
             <p class="text-gray-700 whitespace-pre-wrap break-words"><?php echo htmlspecialchars($memo['content']); ?></p>
+            <div class="memo-images-container mt-2 flex flex-wrap gap-2">
+                <?php
+                $images = json_decode($memo['images'] ?? '[]', true);
+                if ($images && is_array($images)) {
+                    foreach ($images as $imgPath) {
+                        $originalPath = str_replace('/cache/', '/images/', $imgPath);
+                        echo '<img src="'.htmlspecialchars($imgPath).'" data-original="'.htmlspecialchars($originalPath).'" class="memo-thumbnail w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity">';
+                    }
+                }
+                ?>
+            </div>
         </div>
         <?php endforeach; ?>
     </div>

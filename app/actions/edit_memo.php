@@ -27,24 +27,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $id = $_POST['id'] ?? '';
 $title = trim($_POST['title'] ?? '');
 $content = trim($_POST['content'] ?? '');
+$images_json = $_POST['images'] ?? '[]';
+
 
 if (empty($id) || empty($title)) {
     send_json_error('ID와 제목은 필수입니다.', 400);
 }
 
 // 4. 데이터베이스 업데이트
-$stmt = $conn->prepare("UPDATE memos SET title = ?, content = ? WHERE id = ?");
+$stmt = $conn->prepare("UPDATE memos SET title = ?, content = ?, images = ? WHERE id = ?");
 if ($stmt === false) {
     send_json_error('SQL 준비에 실패했습니다: ' . $conn->error);
 }
 
-$stmt->bind_param("ssi", $title, $content, $id);
+$stmt->bind_param("sssi", $title, $content, $images_json, $id);
 
 if ($stmt->execute()) {
     $stmt->close();
     
     // 성공 시, 업데이트된 메모 정보를 다시 조회하여 반환
-    $memo_query = $conn->prepare("SELECT id, title, content, created_at FROM memos WHERE id = ?");
+    $memo_query = $conn->prepare("SELECT id, title, content, images, created_at FROM memos WHERE id = ?");
     $memo_query->bind_param("i", $id);
     $memo_query->execute();
     $result = $memo_query->get_result();

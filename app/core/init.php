@@ -42,7 +42,7 @@ if ($fav_result) {
 
 // 메모 목록
 $memos = [];
-$memo_result = $conn->query("SELECT id, title, content, created_at FROM memos ORDER BY created_at DESC");
+$memo_result = $conn->query("SELECT id, title, content, images, created_at FROM memos ORDER BY created_at DESC");
 if ($memo_result) {
     while($row = $memo_result->fetch_assoc()) {
         $memos[] = $row;

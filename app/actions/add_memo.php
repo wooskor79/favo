@@ -9,19 +9,20 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $title = trim($_POST['title'] ?? '');
 $content = trim($_POST['content'] ?? '');
+$images_json = $_POST['images'] ?? '[]';
 
-if (empty($title) || empty($content)) {
+if (empty($title)) {
     http_response_code(400);
-    exit('제목과 내용을 입력하세요.');
+    exit('제목을 입력하세요.');
 }
 
-$stmt = $conn->prepare("INSERT INTO memos (title, content, created_at) VALUES (?, ?, NOW())");
-$stmt->bind_param("ss", $title, $content);
+$stmt = $conn->prepare("INSERT INTO memos (title, content, images, created_at) VALUES (?, ?, ?, NOW())");
+$stmt->bind_param("sss", $title, $content, $images_json);
 
 if ($stmt->execute()) {
     // 성공 시 마지막으로 삽입된 메모의 정보를 JSON으로 반환
     $last_id = $conn->insert_id;
-    $memo_query = $conn->prepare("SELECT id, title, content, created_at FROM memos WHERE id = ?");
+    $memo_query = $conn->prepare("SELECT id, title, content, images, created_at FROM memos WHERE id = ?");
     $memo_query->bind_param("i", $last_id);
     $memo_query->execute();
     $result = $memo_query->get_result();

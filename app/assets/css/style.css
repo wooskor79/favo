@@ -48,6 +48,39 @@ body {
     @apply bg-indigo-500 bg-opacity-20 text-indigo-400;
 }
 
+/* 이미지 미리보기 스타일 */
+.image-preview-wrapper {
+    position: relative;
+    display: inline-block;
+}
+.remove-image-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: rgba(220, 38, 38, 0.9);
+    color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+.remove-image-btn:hover {
+    background-color: rgba(185, 28, 28, 1);
+}
+.dark-mode .remove-image-btn {
+    border-color: #2d3748;
+}
+
+
 /* 다크 모드 스타일 */
 .dark-mode body {
     background-color: #1a202c;

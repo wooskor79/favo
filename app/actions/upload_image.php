@@ -11,6 +11,11 @@ function send_json_error($message, $code = 500) {
     exit;
 }
 
+// 0. GD 라이브러리 확인
+if (!extension_loaded('gd')) {
+    send_json_error('서버에 이미지 처리 라이브러리(GD)가 설치되지 않았습니다.', 500);
+}
+
 // 1. 로그인 상태 확인
 if (!$is_loggedin) {
     send_json_error('로그인이 필요합니다.', 403);
@@ -65,7 +70,12 @@ if (!move_uploaded_file($file['tmp_name'], $original_path)) {
 
 // 썸네일 생성 함수
 function create_thumbnail($source_path, $dest_path, $max_width = 300) {
-    list($width, $height, $type) = getimagesize($source_path);
+    $image_info = getimagesize($source_path);
+    if ($image_info === false) {
+        return false;
+    }
+    list($width, $height, $type) = $image_info;
+
     if ($width <= $max_width) { // 원본이 썸네일보다 작으면 그냥 복사
         return copy($source_path, $dest_path);
     }
@@ -128,7 +138,7 @@ function create_thumbnail($source_path, $dest_path, $max_width = 300) {
 
 if (!create_thumbnail($original_path, $thumbnail_path)) {
     unlink($original_path); // 썸네일 생성 실패 시 원본도 삭제
-    send_json_error('썸네일 생성에 실패했습니다.', 500);
+    send_json_error('썸네일 생성에 실패했습니다. 지원되지 않는 이미지 형식이거나 파일이 손상되었을 수 있습니다.', 500);
 }
 
 // 7. 성공 응답 (웹 접근 가능 경로 반환)
