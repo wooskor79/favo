@@ -14,7 +14,7 @@
                 $images = json_decode($memo['images'] ?? '[]', true);
                 if ($images && is_array($images)) {
                     foreach ($images as $imgPath) {
-                        $originalPath = str_replace('/cache/', '/images/', $imgPath);
+                        $originalPath = str_replace('/cache/', '/', $imgPath);
                         echo '<img src="'.htmlspecialchars($imgPath).'" data-original="'.htmlspecialchars($originalPath).'" class="memo-thumbnail w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity">';
                     }
                 }

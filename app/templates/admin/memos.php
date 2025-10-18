@@ -6,7 +6,7 @@
     <h2 class="text-2xl font-semibold mb-4 text-gray-700">새 메모 추가</h2>
     <form id="memoForm" class="flex flex-col gap-4">
         <input type="text" id="memo-title" placeholder="제목" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <textarea id="memo-content" placeholder="메모 내용을 입력하거나 이미지를 붙여넣으세요 (최대 5개)" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-24"></textarea>
+        <textarea id="memo-content" placeholder="메모 내용을 입력하거나 이미지를 붙여넣으세요 (최대 5개)" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-24"></textarea>
         <div id="new-memo-previews" class="flex flex-wrap gap-2 mt-2"></div>
         <button type="submit" class="self-end bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg">추가</button>
     </form>
@@ -41,7 +41,7 @@
                     $images = json_decode($memo['images'] ?? '[]', true);
                     if ($images && is_array($images)) {
                         foreach ($images as $imgPath) {
-                            $originalPath = str_replace('/cache/', '/images/', $imgPath);
+                            $originalPath = str_replace('/cache/', '/', $imgPath);
                             echo '<img src="'.htmlspecialchars($imgPath).'" data-original="'.htmlspecialchars($originalPath).'" class="memo-thumbnail w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity">';
                         }
                     }

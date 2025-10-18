@@ -10,9 +10,10 @@ services:
     ports:
       - "9030:80"
     volumes:
+      # 앱 소스코드 마운트
       - ./app:/var/www/html
-      - /volume1/etc/ectfiles/images:/var/www/html/images
-      - /volume1/etc/ectfiles/cache:/var/www/html/cache
+      # 새로운 이미지 저장 경로를 컨테이너의 /var/www/html/images 폴더와 연결
+      - /volume1/docker/woos_webs/favorites-docker/app/images:/var/www/html/images
     networks:
       - web_services_network
 
