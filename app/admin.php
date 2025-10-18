@@ -29,14 +29,11 @@ $current_tab = $_GET['tab'] ?? 'memos';
     <div class="container mx-auto px-4 py-8">
         <?php include 'templates/partials/admin_header.php'; ?>
 
-        <div class="mb-8 border-b border-gray-200">
-            <nav class="flex items-center space-x-4" aria-label="Tabs">
+        <div class="bg-white p-2 rounded-xl shadow-md mb-8">
+            <nav class="flex items-center space-x-2" aria-label="Tabs">
                 <a href="?tab=memos" class="tab-link <?php if($current_tab === 'memos') echo 'active'; ?>">메모 관리</a>
-                <span class="text-gray-300 dark:text-gray-600">|</span>
                 <a href="?tab=favorites" class="tab-link <?php if($current_tab === 'favorites') echo 'active'; ?>">즐겨찾기 관리</a>
-                <span class="text-gray-300 dark:text-gray-600">|</span>
                 <a href="?tab=quick_links" class="tab-link <?php if($current_tab === 'quick_links') echo 'active'; ?>">빠른 링크 관리</a>
-                 <span class="text-gray-300 dark:text-gray-600">|</span>
                 <a href="?tab=url_shortener" class="tab-link <?php if($current_tab === 'url_shortener') echo 'active'; ?>">URL줄이기 관리</a>
             </nav>
         </div>

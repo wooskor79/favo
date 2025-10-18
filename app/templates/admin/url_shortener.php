@@ -54,20 +54,31 @@ $search = $_GET['q'] ?? '';
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 011-1h8a1 1 0 011 1v12a1 1 0 01-1 1h-8a1 1 0 01-1-1V3zM5 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H5z"></path></svg>
                         </button>
                     </td>
-                    <td class="px-5 py-4 border-b border-gray-200 text-sm"><?php echo htmlspecialchars($link['title']); ?></td>
+                    <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                        <span class="view-mode"><?php echo htmlspecialchars($link['title']); ?></span>
+                        <input type="text" value="<?php echo htmlspecialchars($link['title']); ?>" class="edit-mode hidden w-full p-2 border rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </td>
                     <td class="px-5 py-4 border-b border-gray-200 text-sm max-w-xs truncate" title="<?php echo htmlspecialchars($link['long_url']); ?>">
                         <a href="<?php echo htmlspecialchars($link['long_url']); ?>" target="_blank" class="hover:underline"><?php echo htmlspecialchars($link['long_url']); ?></a>
                     </td>
                     <td class="px-5 py-4 border-b border-gray-200 text-sm"><?php echo $link['click_count']; ?></td>
                     <td class="px-5 py-4 border-b border-gray-200 text-sm"><?php echo $link['created_at']; ?></td>
                     <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                        <div class="admin-default-view">
-                            <button onclick="showAdminConfirm(this)" class="text-red-600 hover:text-red-900">삭제</button>
+                        <div class="view-mode">
+                            <div class="admin-default-view flex items-center gap-3">
+                                <button type="button" onclick="showEditShortUrl(<?php echo $link['id']; ?>)" class="text-indigo-600 hover:text-indigo-900">수정</button>
+                                <button type="button" onclick="showAdminConfirm(this)" class="text-red-600 hover:text-red-900">삭제</button>
+                            </div>
+                            <div class="admin-confirm-view hidden items-center gap-2 text-sm">
+                                <a href="actions/delete_short_url.php?id=<?php echo $link['id']; ?>" class="font-bold text-red-600 hover:underline">예</a>
+                                <span class="text-gray-300">|</span>
+                                <button type="button" onclick="hideAdminConfirm(this)" class="font-bold text-gray-600 hover:underline">아니오</button>
+                            </div>
                         </div>
-                        <div class="admin-confirm-view hidden items-center gap-2 text-sm">
-                             <a href="actions/delete_short_url.php?id=<?php echo $link['id']; ?>" class="font-bold text-red-600 hover:underline">예</a>
-                             <span class="text-gray-300">|</span>
-                             <button onclick="hideAdminConfirm(this)" class="font-bold text-gray-600 hover:underline">아니오</button>
+                        <div class="edit-mode hidden items-center gap-2">
+                            <button onclick="saveShortUrl(<?php echo $link['id']; ?>)" class="font-bold text-green-600 hover:underline">저장</button>
+                            <span class="text-gray-300">|</span>
+                            <button onclick="hideEditShortUrl(<?php echo $link['id']; ?>)" class="font-bold text-gray-600 hover:underline">취소</button>
                         </div>
                     </td>
                 </tr>

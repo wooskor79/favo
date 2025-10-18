@@ -87,14 +87,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         memoForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            if (!titleInput.value.trim()) return alert("제목을 입력하세요.");
-
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
             const imagePaths = Array.from(newMemoPreviews.querySelectorAll('.image-preview-wrapper'))
                 .map(wrapper => wrapper.dataset.filePath);
 
+            if (!title) return alert("제목을 입력하세요.");
+            if (!content && imagePaths.length === 0) return alert("내용을 입력하거나 이미지를 추가해야 합니다.");
+
             const formData = new FormData();
-            formData.append('title', titleInput.value.trim());
-            formData.append('content', contentInput.value.trim());
+            formData.append('title', title);
+            formData.append('content', content);
             formData.append('images', JSON.stringify(imagePaths));
 
             try {
@@ -116,47 +119,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const lightboxImage = document.getElementById('lightbox-image');
     const lightboxClose = document.getElementById('lightbox-close');
 
-    document.body.addEventListener('click', (e) => {
-        if (e.target.classList.contains('memo-thumbnail')) {
-            lightboxImage.src = e.target.dataset.original;
-            lightbox.classList.remove('hidden');
-            lightbox.classList.add('flex');
-        }
-    });
+    if(lightbox) {
+        document.body.addEventListener('click', (e) => {
+            if (e.target.classList.contains('memo-thumbnail')) {
+                lightboxImage.src = e.target.dataset.original;
+                lightbox.classList.remove('hidden');
+                lightbox.classList.add('flex');
+            }
+        });
 
-    const closeLightbox = () => {
-        lightbox.classList.add('hidden');
-        lightbox.classList.remove('flex');
-        lightboxImage.src = '';
-    };
+        const closeLightbox = () => {
+            lightbox.classList.add('hidden');
+            lightbox.classList.remove('flex');
+            lightboxImage.src = '';
+        };
 
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) closeLightbox();
-    });
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+    }
 });
 
 // --- 인라인 관리 기능 (수정, 삭제 확인 등) ---
 
 function showAdminConfirm(buttonElement) {
-    const container = buttonElement.closest('.admin-default-view');
-    if (container) {
-        const confirmView = container.nextElementSibling;
-        container.classList.add('hidden');
-        confirmView.classList.remove('hidden');
-        confirmView.classList.add('flex');
+    const defaultView = buttonElement.closest('.admin-default-view');
+    if (defaultView) {
+        const confirmView = defaultView.nextElementSibling;
+        defaultView.classList.add('hidden');
+        if(confirmView) {
+            confirmView.classList.remove('hidden');
+            confirmView.classList.add('flex');
+        }
     }
 }
 
 function hideAdminConfirm(buttonElement) {
-    const container = buttonElement.closest('.admin-confirm-view');
-    if (container) {
-        const defaultView = container.previousElementSibling;
-        container.classList.add('hidden');
-        container.classList.remove('flex');
-        defaultView.classList.remove('hidden');
+    const confirmView = buttonElement.closest('.admin-confirm-view');
+    if (confirmView) {
+        const defaultView = confirmView.previousElementSibling;
+        confirmView.classList.add('hidden');
+        confirmView.classList.remove('flex');
+        if(defaultView) defaultView.classList.remove('hidden');
     }
 }
+
 
 // --- 즐겨찾기 수정 ---
 function showEditFavorite(id) {
@@ -224,6 +232,7 @@ async function saveLink(id) {
     } catch (error) { alert('저장 중 오류가 발생했습니다.'); }
 }
 
+
 // --- 메모 수정/삭제 ---
 function showEditMemo(id, imagesJson) {
     const memoCard = document.getElementById(`memo-${id}`);
@@ -233,7 +242,7 @@ function showEditMemo(id, imagesJson) {
         editView.classList.remove('hidden');
 
         const previewContainer = editView.querySelector('.edit-memo-previews');
-        previewContainer.innerHTML = ''; // 기존 미리보기 초기화
+        previewContainer.innerHTML = ''; 
         
         try {
             const images = JSON.parse(imagesJson);
@@ -249,9 +258,8 @@ function showEditMemo(id, imagesJson) {
                     previewContainer.appendChild(previewWrapper);
                 });
             }
-        } catch(e) { /* 이미지가 없는 경우 무시 */ }
+        } catch(e) { /* ignore */ }
 
-        // 수정 중 붙여넣기 이벤트 리스너 추가
         const editContent = editView.querySelector('.memo-edit-content');
         editContent.onpaste = (e) => handlePaste(e, previewContainer);
     }
@@ -262,7 +270,7 @@ function hideEditMemo(id) {
     const memoCard = document.getElementById(`memo-${id}`);
     if (memoCard) {
         const editContent = memoCard.querySelector('.memo-edit-content');
-        editContent.onpaste = null; // 이벤트 리스너 제거
+        if(editContent) editContent.onpaste = null;
         memoCard.querySelector('.memo-display-view').classList.remove('hidden');
         memoCard.querySelector('.memo-edit-view').classList.add('hidden');
     }
@@ -287,16 +295,15 @@ async function saveMemo(id) {
         const res = await fetch('actions/edit_memo.php', { method: 'POST', body: new URLSearchParams(formData) });
         const data = await res.json();
         if (res.ok) {
-            // UI 업데이트
             const displayView = memoCard.querySelector('.memo-display-view');
             displayView.querySelector('.memo-title-text').textContent = data.title;
             displayView.querySelector('.memo-content-text').textContent = data.content;
             
             const imageContainer = displayView.querySelector('.memo-images-container');
             imageContainer.innerHTML = '';
-            const images = JSON.parse(data.images || '[]');
+            const images = data.images ? JSON.parse(data.images) : [];
             images.forEach(path => {
-                const originalPath = path.replace('/cache/', '/images/');
+                const originalPath = path.replace('/cache/', '/');
                 const img = document.createElement('img');
                 img.src = path;
                 img.dataset.original = originalPath;
@@ -304,9 +311,8 @@ async function saveMemo(id) {
                 imageContainer.appendChild(img);
             });
             
-            // 수정 버튼의 데이터도 갱신
             const editButton = displayView.querySelector('button[onclick^="showEditMemo"]');
-            editButton.setAttribute('onclick', `showEditMemo(${id}, '${escapeHTML(JSON.stringify(data.images || '[]'))}')`);
+            editButton.setAttribute('onclick', `showEditMemo(${id}, '${escapeHTML(data.images || '[]')}')`);
 
             hideEditMemo(id);
         } else {
@@ -325,6 +331,44 @@ async function deleteMemo(id) {
         }
     } catch (error) { alert('오류가 발생했습니다.'); }
 }
+
+
+// --- 단축 URL 수정 기능 (새로 추가) ---
+function showEditShortUrl(id) {
+    const row = document.getElementById(`short-link-row-${id}`);
+    row.querySelectorAll('.view-mode').forEach(el => el.classList.add('hidden'));
+    row.querySelectorAll('.edit-mode').forEach(el => el.classList.remove('hidden'));
+}
+
+function hideEditShortUrl(id) {
+    const row = document.getElementById(`short-link-row-${id}`);
+    row.querySelectorAll('.view-mode').forEach(el => el.classList.remove('hidden'));
+    row.querySelectorAll('.edit-mode').forEach(el => el.classList.add('hidden'));
+}
+
+async function saveShortUrl(id) {
+    const row = document.getElementById(`short-link-row-${id}`);
+    const titleInput = row.querySelector('td:nth-child(2) .edit-mode'); // 2번째 열(별칭)
+
+    const formData = new FormData();
+    formData.append('id', id);
+    formData.append('title', titleInput.value.trim());
+
+    try {
+        const res = await fetch('actions/edit_short_url.php', { method: 'POST', body: new URLSearchParams(formData) });
+        const data = await res.json();
+        if (res.ok) {
+            row.querySelector('td:nth-child(2) .view-mode').textContent = data.title;
+            hideEditShortUrl(id);
+        } else {
+            alert('별칭 저장 실패: ' + (data.error || '알 수 없는 오류'));
+        }
+    } catch (error) {
+        console.error('Save short URL error:', error);
+        alert('저장 중 오류가 발생했습니다.');
+    }
+}
+
 
 // --- 클립보드 복사 ---
 function copyToClipboard(text) {

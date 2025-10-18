@@ -34,19 +34,20 @@ body {
     font-size: 0.875rem;
 }
 
-/* 관리자 페이지 탭 스타일 (새로 추가) */
+/* 관리자 페이지 탭 스타일 (수정됨) */
 .tab-link {
-    @apply px-3 py-2 font-medium text-sm rounded-md text-gray-500 hover:text-gray-700;
+    @apply flex-grow text-center px-4 py-2 font-semibold text-sm rounded-lg text-gray-600 hover:bg-gray-100 transition-colors;
 }
 .tab-link.active {
-    @apply bg-indigo-100 text-indigo-700;
+    @apply bg-blue-500 text-white shadow;
 }
 .dark-mode .tab-link {
-    @apply text-gray-400 hover:text-white;
+    @apply text-gray-300 hover:bg-gray-700;
 }
 .dark-mode .tab-link.active {
-    @apply bg-indigo-500 bg-opacity-20 text-indigo-400;
+    @apply bg-blue-600 text-white;
 }
+
 
 /* 이미지 미리보기 스타일 */
 .image-preview-wrapper {

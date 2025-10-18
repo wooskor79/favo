@@ -1,77 +1,94 @@
 <?php
-// File: src/init.php
-// 데이터베이스 연결 및 모든 데이터 조회 로직 담당
+// File: app/core/init.php
+
+// =============== 1. 기본 설정 ===============
 session_start();
-require_once 'db.php';
 
-// 그룹 목록 가져오기
-$groups_result = $conn->query("
-    SELECT * FROM groups
-    ORDER BY
-        CASE
-            WHEN name = '기본 그룹' THEN 1
-            ELSE 2
-        END,
-        name ASC
-");
-$groups = [];
-while($row = $groups_result->fetch_assoc()) {
-    $groups[] = $row;
+
+// =============== 2. 데이터베이스 연결 ===============
+$db_host = 'common_database_server';
+$db_name = 'favorites_db';
+$db_user = 'root';
+$db_pass = 'dldntjd@D79';
+
+// 메인 DB 연결
+$conn = @new mysqli($db_host, $db_user, $db_pass, $db_name);
+
+if ($conn->connect_error) {
+    die("데이터베이스 연결 실패: " . $conn->connect_error);
+}
+$conn->set_charset("utf8mb4");
+
+// Shortener DB 연결을 위한 함수 (새로 추가 및 수정)
+function get_shortener_db_connection() {
+    global $db_host, $db_user, $db_pass;
+    $shortener_db_name = 'shortener';
+    
+    $conn_shortener = new mysqli($db_host, $db_user, $db_pass, $shortener_db_name);
+
+    if ($conn_shortener->connect_error) {
+        return null; // 연결 실패 시 null 반환
+    }
+    $conn_shortener->set_charset("utf8mb4");
+    return $conn_shortener;
 }
 
-// 즐겨찾기 목록 그룹별로 묶기
-$favorites_by_group = [];
-$fav_query = "
-    SELECT g.id as group_id, g.name as group_name, f.id, f.url, f.alias
-    FROM favorites f
-    LEFT JOIN groups g ON f.group_id = g.id
-    ORDER BY
-        CASE
-            WHEN g.name = '기본 그룹' THEN 1
-            ELSE 2
-        END,
-        g.name ASC,
-        f.created_at DESC";
-$fav_result = $conn->query($fav_query);
-while($row = $fav_result->fetch_assoc()){
-    $group_name = $row['group_name'] ?? '미분류';
-    if(!empty($group_name)) {
-        $favorites_by_group[$group_name][] = $row;
+
+// =============== 3. 데이터 조회 ===============
+
+// 즐겨찾기 목록
+$favorites = [];
+$fav_result = $conn->query("SELECT * FROM favorites ORDER BY created_at DESC");
+if ($fav_result) {
+    while($row = $fav_result->fetch_assoc()) {
+        $favorites[] = $row;
     }
 }
 
-// 즐겨찾기 없는 그룹 제거 (기본 그룹 제외)
-foreach ($groups as $key => $group) {
-    if (!isset($favorites_by_group[$group['name']])) {
-        if ($group['name'] !== '기본 그룹') {
-            unset($groups[$key]);
-        }
-    }
-}
-
-// 메모 목록 불러오기
+// 메모 목록
 $memos = [];
-$memo_query = "SELECT id, title, content, created_at FROM memos ORDER BY created_at DESC";
-if ($memo_result = $conn->query($memo_query)) {
+$memo_result = $conn->query("SELECT id, title, content, images, created_at FROM memos ORDER BY created_at DESC");
+if ($memo_result) {
     while($row = $memo_result->fetch_assoc()) {
         $memos[] = $row;
     }
 }
 
-// 빠른 링크 목록 불러오기
+// 빠른 링크 목록
 $quick_links = [];
-$quick_links_query = "SELECT * FROM quick_links ORDER BY created_at ASC";
-if ($quick_links_result = $conn->query($quick_links_query)) {
+$quick_links_result = $conn->query("SELECT * FROM quick_links ORDER BY created_at ASC");
+if ($quick_links_result) {
     while($row = $quick_links_result->fetch_assoc()) {
         $quick_links[] = $row;
     }
 }
 
-// 세션 오류 메시지 처리
+// =============== 4. 변수 설정 ===============
 $error = $_SESSION['error'] ?? '';
 unset($_SESSION['error']);
 
-// 로그인 상태 확인
 $is_loggedin = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
+
+// =============== 5. URL 단축기(Shortener) 연동 (수정됨) ===============
+$shortener_links = [];
+if ($is_loggedin && basename($_SERVER['PHP_SELF']) == 'admin.php' && ($_GET['tab'] ?? '') === 'url_shortener') {
+    $conn_shortener = get_shortener_db_connection(); // 함수 사용
+    if ($conn_shortener) {
+        $search_query = $_GET['q'] ?? '';
+        $sql = "SELECT * FROM links WHERE code IS NOT NULL";
+        if (!empty($search_query)) {
+            $sql .= " AND (code LIKE '%" . $conn_shortener->real_escape_string($search_query) . "%' OR title LIKE '%" . $conn_shortener->real_escape_string($search_query) . "%')";
+        }
+        $sql .= " ORDER BY id DESC";
+        
+        $shortener_result = $conn_shortener->query($sql);
+        if ($shortener_result) {
+            while($row = $shortener_result->fetch_assoc()) {
+                $shortener_links[] = $row;
+            }
+        }
+        $conn_shortener->close();
+    }
+}
 ?>

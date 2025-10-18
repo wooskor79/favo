@@ -10,11 +10,8 @@ if (!$is_loggedin) {
 $id = $_GET['id'] ?? null;
 
 if ($id) {
-    // Shortener DB에 연결
-    $shortener_db_name = 'shortener';
-    $conn_shortener = new mysqli($db_host, $db_user, $db_pass, $shortener_db_name);
-    
-    if (!$conn_shortener->connect_error) {
+    $conn_shortener = get_shortener_db_connection();
+    if ($conn_shortener) {
         $stmt = $conn_shortener->prepare("DELETE FROM links WHERE id = ?");
         $stmt->bind_param("i", $id);
         if ($stmt->execute()) {

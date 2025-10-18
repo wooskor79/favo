@@ -21,16 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $long_url = "https://".$long_url;
     }
 
-    // Shortener DB에 연결
-    $shortener_db_name = 'shortener';
-    $conn_shortener = new mysqli($db_host, $db_user, $db_pass, $shortener_db_name);
-
-    if ($conn_shortener->connect_error) {
-        $_SESSION['error'] = "Shortener 데이터베이스 연결에 실패했습니다: " . $conn_shortener->connect_error;
+    $conn_shortener = get_shortener_db_connection();
+    if (!$conn_shortener) {
+        $_SESSION['error'] = "Shortener 데이터베이스 연결에 실패했습니다.";
         header("location: ../admin.php?tab=url_shortener");
         exit;
     }
-    $conn_shortener->set_charset("utf8mb4");
 
     // 5자리 영문자로 된 고유 코드 생성
     $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
